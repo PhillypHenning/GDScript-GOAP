@@ -5,25 +5,25 @@ class_name Planner
 const Goal = preload("res://scripts/Goal.gd")
 
 # Create a plan of actions that the AI can take to achieve a goal
-func plan(actions: Array, goal: Goal, current_state: Dictionary) -> Action:
+func plan(actions: Array, goals: Array, current_state: Dictionary) -> Action:
 	# Given a goal, the state and the available actions create an action plan
-	var debug_message: String = "Goal: [{goal}]\nAvailable Actions:\n".format({"goal": goal.goal_name})
+	var debug_message: String
+	for goal in goals:
+		debug_message += "Goal: [{goal}]\n".format({"goal": goal.goal_name})
+	debug_message += "Available Actions:\n"
 	for action in actions:
 		debug_message += "\tAction: [{action}]\n".format({"action": action.action_name})
 	debug_message += "Current State: [{state}]".format({"state": current_state})
 	print(debug_message)
 
-	# Is the Desired State already achieved?
-	if current_state.get(goal.goal_name):
-		return null
-	
+	var target_goals = determine_and_prioritize_goals(goals, current_state)
+
 	# Desired state needs to be achieved, create an action plan
 	## NOTE: In this step the goal should be searched for, if there is a prereq and the prereq it currently not achieved than the action plan should be returned to achieve the prereq.
-	return build_plan(actions, goal, current_state)
+	return build_plan(actions, target_goals[0], current_state)
 
 
 func build_plan(actions: Array, goal: Goal, state: Dictionary) -> Action:
-	# 1. Search through actions for goal target
 	var sub_goals: Array = []
 	
 	for action in actions:
@@ -40,8 +40,10 @@ func build_plan(actions: Array, goal: Goal, state: Dictionary) -> Action:
 			return action
 	return null
 
-func apply_action_effects(goal_state: Dictionary, effects: Dictionary) -> Dictionary:
-	var new_goal_state = goal_state.duplicate()
-	for effect_key in effects.keys():
-		new_goal_state[effect_key] = effects[effect_key]
-	return new_goal_state
+func determine_and_prioritize_goals(goals: Array, state: Dictionary) -> Array:
+	var unachieved_goals: Array
+	for goal in goals:
+		if !state.get(goal.goal_name):
+			unachieved_goals.append(goal)
+	unachieved_goals.sort_custom(func(a, b): return a.priority > b.priority)
+	return unachieved_goals
