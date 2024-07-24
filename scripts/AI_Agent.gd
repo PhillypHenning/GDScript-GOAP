@@ -14,9 +14,7 @@ var secondary_goals: Array = []
 var actions: Array = []
 var state: Dictionary = {}
 var current_plan: Array = []
-var static_actions: Array = [
-	Action.new("KeepLightOnYourToes", {}, {}, {}),
-]
+var static_actions: Array = []
 var available_actions: Array = []
 
 var debug_print: bool = false
@@ -30,6 +28,7 @@ var simulated_character: Dictionary = {
 	"health": 10,
 	"max_health": 10,
 }
+var control_run_planner: bool = false
 
 func _ready():
 	state = {
@@ -43,9 +42,15 @@ func _ready():
 func _process(_delta: float) -> void:
 	handle_debug()
 
-	determine_priority_goal()
-	plan_secondary_goals()
-	run_planner()
+	primary_goals=determine_priority_goal(primary_goals)
+	#secondary_goals=plan_secondary_goals(secondary_goals)
+	
+
+	#run_planner()
+	if control_run_planner:
+		run_planner()
+		control_run_planner = false
+
 
 
 
@@ -54,30 +59,50 @@ func calculate_stay_alive_goal_priority(parameters: Dictionary) -> float:
 	return calculated_priority
 
 
-func determine_priority_goal() -> void:
+# Takes an array of goals, runs the "calculate_goal_priority" function which either calls the goal callable or returns the static priority. Sorts the goals from highest priority to lowest.
+func determine_priority_goal(goals: Array) -> Array:
 	var current_goal_priorities: Array
-	for i in range(primary_goals.size()):
-		primary_goals[i].calculate_goal_priority(simulated_character)
-		current_goal_priorities.append(primary_goals[i].goal_priority)
+	for i in range(goals.size()):
+		goals[i].calculate_goal_priority(simulated_character)
+		current_goal_priorities.append(goals[i].goal_priority)
 	
-	primary_goals.sort_custom(func (a,b): return a.goal_priority > b.goal_priority)
+	goals.sort_custom(func (a,b): return a.goal_priority > b.goal_priority)
 	
 	if current_goal_priorities != debug_current_goal_priorities:
 		debug_print_goals = true
 		debug_print = true
 		debug_current_goal_priorities = current_goal_priorities
+	
+	return goals
+
+# Takes an Array of primary goals, runs the Planner "plan_secondary_goals" function.
+# The "plan_secondary_goals" function runs through all primary goals and available actions and builds a new goal list that will be used to achieve the desired state.
+func plan_secondary_goals(goals: Array) -> Array:
+	var planner = Planner.new()
+	goals = planner.plan_secondary_goals(available_actions, primary_goals, state)
+	if len(goals) != len(debug_secondary_goal_priorities):
+		debug_secondary_goal_priorities=goals
+		debug_print_secondary_goals = true
+		debug_print = true
+	return goals
+
+func run_planner() -> void:
+	var planner = Planner.new()
+	var plan: Array = planner.build_plan(available_actions, primary_goals, secondary_goals, state)
+	if current_plan != plan:
+		current_plan = plan
+		debug_print_plan = true
+		debug_print = true
 
 
 func handle_debug() -> void:
 	if debug_print:
 		print("--START CHANGE--")
 		if debug_print_goals:
-			print(len(primary_goals))
 			for goal in primary_goals:
 				print("Goal: [{goal}], Priority: [{priority}]".format({"goal": goal.goal_name, "priority": goal.goal_priority}))
 			debug_print_goals = false
 		if debug_print_secondary_goals:
-			print(len(secondary_goals))
 			for goal in secondary_goals:
 				print("Secondary Goal: [{goal}], Priority: [{priority}]".format({"goal": goal.goal_name, "priority": goal.goal_priority}))
 			debug_print_secondary_goals = false
@@ -91,23 +116,6 @@ func handle_debug() -> void:
 	if debug_print:
 		print("--END CHANGE--")
 		debug_print = false
-
-func plan_secondary_goals() -> void:
-	var planner = Planner.new()
-	secondary_goals = planner.plan_secondary_goals(available_actions, primary_goals, state)
-	#print("Hash1: [{hash1}], Hash2: [{hash2}]".format({"hash1": secondary_goals.hash(), "hash2": debug_secondary_goal_priorities.hash()}))
-	if len(secondary_goals) != len(debug_secondary_goal_priorities):
-		debug_secondary_goal_priorities=secondary_goals
-		debug_print_secondary_goals = true
-		debug_print = true
-
-func run_planner() -> void:
-	var planner = Planner.new()
-	var plan: Array = planner.plan(available_actions, primary_goals, secondary_goals, state)
-	if current_plan != plan:
-		current_plan = plan
-		debug_print_plan = true
-		debug_print = true
 
 
 func _on_decrease_health_button_pressed():
@@ -129,3 +137,11 @@ func _on_defend_action_button_pressed():
 	available_actions.append(Action.new("DefendAgainstAttack", {"chracter_can_defend": true, "character_is_being_attacked": true}, {"save_health": true}, {}))
 	debug_print_available_actions = true
 	debug_print = true
+
+
+func _on_run_planner_pressed():
+	control_run_planner = true
+
+
+func _on_print_state_pressed():
+	print(state)

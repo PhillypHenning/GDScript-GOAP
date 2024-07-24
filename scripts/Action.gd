@@ -26,3 +26,6 @@ func apply(agent_state: Dictionary) -> Dictionary:
 	for key in cost.keys():
 		new_state[key] = cost[key]
 	return new_state
+
+func print():
+	return "Name: [{name}]\n\tPreconditions: [{preconditions}]\n\tEffects: [{effects}]\n\tCost: [{cost}]".format({"name": self.action_name, "preconditions": self.preconditions, "effects": self.effects, "cost": self.cost})

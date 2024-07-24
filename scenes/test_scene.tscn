@@ -52,7 +52,25 @@ offset_right = 1040.0
 offset_bottom = 327.0
 text = "Defend"
 
+[node name="RunPlanner" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 512.0
+offset_right = 167.0
+offset_bottom = 543.0
+text = "Run Planner"
+
+[node name="PrintState" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 448.0
+offset_right = 160.0
+offset_bottom = 479.0
+text = "Print State"
+
 [connection signal="pressed" from="Control/DecreaseHealthButton" to="AIAgent" method="_on_decrease_health_button_pressed"]
 [connection signal="pressed" from="Control/IncreaseHealthButton" to="AIAgent" method="_on_increase_health_button_pressed"]
 [connection signal="pressed" from="Control/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
 [connection signal="pressed" from="Control/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]
+[connection signal="pressed" from="Control/RunPlanner" to="AIAgent" method="_on_run_planner_pressed"]
+[connection signal="pressed" from="Control/PrintState" to="AIAgent" method="_on_print_state_pressed"]

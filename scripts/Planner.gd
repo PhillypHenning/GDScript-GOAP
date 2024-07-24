@@ -3,6 +3,27 @@ extends Node
 class_name Planner
 #
 const Goal = preload("res://scripts/Goal.gd")
+const Action = preload("res://scripts/Action.gd")
+
+var Static_Goals: Dictionary = {
+	"desired_world_state": Goal.new().new_goal_with_static_priority("goal_name", 0.1),
+	"chracter_can_see_target": Goal.new().new_goal_with_static_priority("wait_until_character_can_attack", 6.0),
+	"character_in_attack_range": Goal.new().new_goal_with_static_priority("get_line_of_sight", 6.0),
+	"chracter_able_to_attack": Goal.new().new_goal_with_static_priority("get_into_attack_range", 6.0),
+}
+var Static_Actions: Array = [
+	Action.new("move_into_attack_range", 
+		{	# Preconditions
+			"character_in_attack_range": false, 
+		}, 
+		{	# Effects
+			"character_in_attack_range": true
+		}, 
+		{	# Cost
+			
+		},
+	),
+]
 
 
 
@@ -16,13 +37,39 @@ func plan_secondary_goals(actions: Array, goals: Array, state: Dictionary) -> Ar
 		for key in state_keys:
 			var precondition = action.preconditions.get(key)
 			if precondition:
-				if key == "chracter_can_see_target" and !state.get(key):
-					secondary_goals.append(Goal.new().new_goal_with_static_priority("get_line_of_sight", 6.0))
-				elif key == "character_in_attack_range" and !state.get(key):
-					secondary_goals.append(Goal.new().new_goal_with_static_priority("get_into_attack_range", 6.0))
-				elif key == "chracter_able_to_attack" and !state.get(key):
-					secondary_goals.append(Goal.new().new_goal_with_static_priority("wait_until_character_can_attack", 6.0))	
+				var found_static_goal: Goal = Static_Goals.get(key)
+				if found_static_goal and !state.get(key):
+					secondary_goals.append(found_static_goal)
 	return secondary_goals
+
+func build_plan(actions: Array, primary_goals: Array, secondary_goals: Array, state: Dictionary) -> Array:
+	var build_plan: Array = []
+	var state_keys = state.keys()	
+	var states_needed: Array
+	
+	# Collect all states that are needed
+	for action in actions:
+		for precondition in action.preconditions:
+			if state_keys.has(precondition):
+				var have_state = state.get(precondition)
+				var precondition_needed = action.preconditions.get(precondition)
+				if have_state != precondition_needed:
+					states_needed.append({precondition: precondition_needed})
+
+
+	var actions_that_satisfy_world_state: Array
+	# For all needed states find actions that could satisfy them
+	for action in Static_Actions:
+		for need_state in states_needed:
+			for nstate in need_state:
+				for effect in action.effects:
+					if nstate == effect:
+						if action.effects[effect] == need_state[nstate]:
+							actions_that_satisfy_world_state.append(action)
+
+	print(actions_that_satisfy_world_state)
+
+	return build_plan
 
 # First consider primary goals and whether they are achievable
 # Next consider secondary goals and how they can be achieved
