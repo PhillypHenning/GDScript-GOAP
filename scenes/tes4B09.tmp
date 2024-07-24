@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://clmrt5aio2vjf"]
+
+[ext_resource type="PackedScene" uid="uid://b27tsifoe4feu" path="res://scenes/ai_agent.tscn" id="1_lra56"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="AIAgent" parent="." instance=ExtResource("1_lra56")]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="DecreaseHealthButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 960.0
+offset_top = 64.0
+offset_right = 1088.0
+offset_bottom = 95.0
+text = "Decrease Health"
+
+[node name="IncreaseHealthButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 960.0
+offset_top = 104.0
+offset_right = 1095.0
+offset_bottom = 135.0
+text = "Increase Health"
+
+[node name="TextEdit" type="TextEdit" parent="Control"]
+layout_mode = 0
+offset_left = 920.0
+offset_top = 216.0
+offset_right = 1080.0
+offset_bottom = 248.0
+text = "Add Action to Stack"
+
+[node name="AttackActionButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 968.0
+offset_top = 256.0
+offset_right = 1040.0
+offset_bottom = 287.0
+text = "Attack"
+
+[node name="DefendActionButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 968.0
+offset_top = 296.0
+offset_right = 1040.0
+offset_bottom = 327.0
+text = "Defend"
+
+[connection signal="pressed" from="Control/DecreaseHealthButton" to="AIAgent" method="_on_decrease_health_button_pressed"]
+[connection signal="pressed" from="Control/IncreaseHealthButton" to="AIAgent" method="_on_increase_health_button_pressed"]
+[connection signal="pressed" from="Control/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
+[connection signal="pressed" from="Control/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]

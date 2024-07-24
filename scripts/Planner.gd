@@ -1,8 +1,35 @@
 extends Node
 #
-#class_name Planner
+class_name Planner
 #
-#const Goal = preload("res://scripts/Goal.gd")
+const Goal = preload("res://scripts/Goal.gd")
+
+
+
+# Consider the actions available and the goals that need to be achieved. 
+# Based on the state, come up with "interm" goals that need to be accomplished
+# Interm goals are goals that are "fluid"/"dynamic".
+func plan_secondary_goals(actions: Array, goals: Array, state: Dictionary) -> Array:
+	var secondary_goals: Array = []
+	var state_keys = state.keys()
+	for action in actions:
+		for key in state_keys:
+			var precondition = action.preconditions.get(key)
+			if precondition:
+				if key == "chracter_can_see_target" and !state.get(key):
+					secondary_goals.append(Goal.new().new_goal_with_static_priority("get_line_of_sight", 6.0))
+				elif key == "character_in_attack_range" and !state.get(key):
+					secondary_goals.append(Goal.new().new_goal_with_static_priority("get_into_attack_range", 6.0))
+				elif key == "chracter_able_to_attack" and !state.get(key):
+					secondary_goals.append(Goal.new().new_goal_with_static_priority("wait_until_character_can_attack", 6.0))	
+	return secondary_goals
+
+# First consider primary goals and whether they are achievable
+# Next consider secondary goals and how they can be achieved
+# return an Action Plan to accomplish the goals. The Action Plan will be fed into another AI (FSM) which will perform the actions in the plan.
+func plan(actions: Array, primary_goals: Array, secondary_goals: Array, state: Dictionary) -> Array:
+	return []
+
 #
 ## Create a plan of actions that the AI can take to achieve a goal
 #func plan(actions: Array, goals: Array, current_state: Dictionary) -> Action:

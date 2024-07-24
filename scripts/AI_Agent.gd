@@ -19,36 +19,34 @@ var static_actions: Array = [
 ]
 var available_actions: Array = []
 
-
+var debug_print: bool = false
 var debug_print_goals: bool = false
-var debug_current_goal_priorities: Array = []
 var debug_print_available_actions: bool = false
+var debug_print_secondary_goals: bool = false
+var debug_print_plan: bool = false
+var debug_current_goal_priorities: Array = []
+var debug_secondary_goal_priorities: Array = []
 var simulated_character: Dictionary = {
 	"health": 10,
 	"max_health": 10,
 }
 
 func _ready():
-	state = {}
+	state = {
+		"chracter_can_see_target" = false,
+		"character_in_attack_range" = false,
+		"chracter_able_to_attack" = false,
+	}
 	primary_goals.append(Goal.new().new_goal_with_callable("stay_alive", calculate_stay_alive_goal_priority))
 	primary_goals.append(Goal.new().new_goal_with_static_priority("defeat_enemy", 6.0))
 
 func _process(_delta: float) -> void:
-	if debug_print_goals or debug_print_available_actions:
-		print("-----")
-	if debug_print_goals:
-		print(len(primary_goals))
-		for goal in primary_goals:
-			print("Goal: [{goal}], Priority: [{priority}]".format({"goal": goal.goal_name, "priority": goal.goal_priority}))
-		debug_print_goals = false
-	if debug_print_available_actions:
-		for action in available_actions:
-			print("Action: [{action}]".format({"action": action.action_name}))
-		debug_print_available_actions = false
-	
-	
+	handle_debug()
+
 	determine_priority_goal()
-	
+	plan_secondary_goals()
+	run_planner()
+
 
 
 func calculate_stay_alive_goal_priority(parameters: Dictionary) -> float:
@@ -66,36 +64,50 @@ func determine_priority_goal() -> void:
 	
 	if current_goal_priorities != debug_current_goal_priorities:
 		debug_print_goals = true
+		debug_print = true
 		debug_current_goal_priorities = current_goal_priorities
 
 
-#func _ready():
-	## Define initial state, goals, and actions
-	#state = {
-		#"has_warehouse": false,
-		#"has_house": false,
-		#"has_wood": false,
-		#"has_axe": false
-	#}
-#
-	#goals.append(Goal.new("has_house", 10))
-	#goals.append(Goal.new("has_warehouse", 5))
-	#
-	#actions.append(Action.new("Get Axe", {}, {"has_axe": true}, {}))
-	#actions.append(Action.new("Collect Wood", {"has_axe": true}, {"has_wood": true}, {}))
-	#actions.append(Action.new("Build House", {"has_wood": true}, {"has_house": true}, {"has_wood": false}))
-	#actions.append(Action.new("Build Warehouse", {"has_wood": true}, {"has_warehouse": true}, {"has_wood": false}))
-#
-	## Plan and execute
-	#var planner = Planner.new()
-	#var current_action = planner.plan(actions, goals, state)
-	#while true:
-		#print("Applying Action: [{action}]".format({"action": current_action.action_name}))
-		#state = current_action.apply(state)
-		#if state["has_house"] && state["has_warehouse"]:
-			#break
-		#current_action = planner.plan(actions, goals, state)
-	#print("Final state: " + str(state))
+func handle_debug() -> void:
+	if debug_print:
+		print("--START CHANGE--")
+		if debug_print_goals:
+			print(len(primary_goals))
+			for goal in primary_goals:
+				print("Goal: [{goal}], Priority: [{priority}]".format({"goal": goal.goal_name, "priority": goal.goal_priority}))
+			debug_print_goals = false
+		if debug_print_secondary_goals:
+			print(len(secondary_goals))
+			for goal in secondary_goals:
+				print("Secondary Goal: [{goal}], Priority: [{priority}]".format({"goal": goal.goal_name, "priority": goal.goal_priority}))
+			debug_print_secondary_goals = false
+		
+		if debug_print_available_actions:
+			for action in available_actions:
+				print("Action: [{action}]".format({"action": action.action_name}))
+			debug_print_available_actions = false
+		if debug_print_plan:
+			print("Plan: [{plan}]".format({"plan": current_plan}))
+	if debug_print:
+		print("--END CHANGE--")
+		debug_print = false
+
+func plan_secondary_goals() -> void:
+	var planner = Planner.new()
+	secondary_goals = planner.plan_secondary_goals(available_actions, primary_goals, state)
+	#print("Hash1: [{hash1}], Hash2: [{hash2}]".format({"hash1": secondary_goals.hash(), "hash2": debug_secondary_goal_priorities.hash()}))
+	if len(secondary_goals) != len(debug_secondary_goal_priorities):
+		debug_secondary_goal_priorities=secondary_goals
+		debug_print_secondary_goals = true
+		debug_print = true
+
+func run_planner() -> void:
+	var planner = Planner.new()
+	var plan: Array = planner.plan(available_actions, primary_goals, secondary_goals, state)
+	if current_plan != plan:
+		current_plan = plan
+		debug_print_plan = true
+		debug_print = true
 
 
 func _on_decrease_health_button_pressed():
@@ -105,9 +117,15 @@ func _on_increase_health_button_pressed():
 	simulated_character.health = clamp(simulated_character.health+1, 0, simulated_character.max_health)
 
 func _on_attack_action_button_pressed():
-	available_actions.append(Action.new("AttackTarget", {"character_in_attack_range": true, "chracter_able_to_attack": true}, {"defeat_enemy": true}, {}))
+	available_actions.append(Action.new("AttackTarget", {
+		"chracter_can_see_target": true,
+		"character_in_attack_range": true, 
+		"chracter_able_to_attack": true,
+	}, {"defeat_enemy": true}, {}))
 	debug_print_available_actions = true
+	debug_print = true
 
 func _on_defend_action_button_pressed():
 	available_actions.append(Action.new("DefendAgainstAttack", {"chracter_can_defend": true, "character_is_being_attacked": true}, {"save_health": true}, {}))
 	debug_print_available_actions = true
+	debug_print = true
