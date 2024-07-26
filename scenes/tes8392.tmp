@@ -24,51 +24,51 @@ text = "Run Planner"
 [node name="CharacterAttributes" type="Node" parent="Control"]
 
 [node name="DecreaseHealthButton" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 752.0
-offset_top = 520.0
-offset_right = 887.0
-offset_bottom = 551.0
+offset_left = 800.0
+offset_top = 552.0
+offset_right = 935.0
+offset_bottom = 583.0
 text = "Decrease Health"
 
 [node name="IncreaseHealthButton" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 576.0
-offset_top = 520.0
-offset_right = 711.0
-offset_bottom = 551.0
+offset_left = 800.0
+offset_top = 592.0
+offset_right = 935.0
+offset_bottom = 623.0
 text = "Increase Health"
 
 [node name="IncreaseStamina" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 576.0
-offset_top = 568.0
-offset_right = 720.0
-offset_bottom = 600.0
+offset_left = 800.0
+offset_top = 640.0
+offset_right = 944.0
+offset_bottom = 672.0
 text = "Increase Stamina"
 
 [node name="DecreaseStamina" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 744.0
-offset_top = 568.0
-offset_right = 892.0
-offset_bottom = 599.0
+offset_left = 800.0
+offset_top = 680.0
+offset_right = 948.0
+offset_bottom = 711.0
 text = "Decrease Stamina"
 
 [node name="TextEdit4" type="TextEdit" parent="Control/CharacterAttributes"]
-offset_left = 632.0
-offset_top = 8.0
-offset_right = 800.0
-offset_bottom = 48.0
+offset_left = 800.0
+offset_top = 16.0
+offset_right = 968.0
+offset_bottom = 56.0
 text = "Simulated Character"
 
 [node name="SimCharDebug" type="TextEdit" parent="Control/CharacterAttributes"]
-offset_left = 576.0
+offset_left = 736.0
 offset_top = 64.0
-offset_right = 888.0
+offset_right = 1048.0
 offset_bottom = 504.0
 
 [node name="Button" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 576.0
-offset_top = 616.0
-offset_right = 704.0
-offset_bottom = 647.0
+offset_left = 808.0
+offset_top = 728.0
+offset_right = 936.0
+offset_bottom = 759.0
 text = "Reset Antsy"
 
 [node name="State" type="Node" parent="Control"]
@@ -77,82 +77,74 @@ text = "Reset Antsy"
 anchors_preset = -1
 anchor_left = 5.0
 anchor_right = 5.0
-offset_left = -13236.0
-offset_top = 8.0
-offset_right = -13180.0
-offset_bottom = 48.0
+offset_left = -8608.0
+offset_top = 16.0
+offset_right = -8552.0
+offset_bottom = 56.0
 text = "State"
 metadata/_edit_use_anchors_ = true
 
 [node name="StateDebug" type="TextEdit" parent="Control/State"]
 anchors_preset = -1
 anchor_left = 4.8
-anchor_right = 4.80296
+anchor_right = 4.8
 anchor_bottom = 0.2
-offset_left = -12896.0
+offset_left = -8440.0
 offset_top = 64.0
-offset_right = -12456.0
+offset_right = -8000.0
 offset_bottom = 256.0
 metadata/_edit_use_anchors_ = true
 
 [node name="Goals" type="Node" parent="Control"]
 
 [node name="TextEdit2" type="TextEdit" parent="Control/Goals"]
-offset_left = 1088.0
+offset_left = 1256.0
 offset_top = 16.0
-offset_right = 1144.0
+offset_right = 1312.0
 offset_bottom = 56.0
 text = "Goals"
 
 [node name="Goals" type="TextEdit" parent="Control/Goals"]
-offset_left = 960.0
+offset_left = 1128.0
 offset_top = 64.0
-offset_right = 1280.0
+offset_right = 1448.0
 offset_bottom = 256.0
 
-[node name="StaticActions" type="Node" parent="Control"]
+[node name="Actions" type="Node" parent="Control"]
 
-[node name="StaticActions" type="TextEdit" parent="Control/StaticActions"]
-offset_left = 1344.0
+[node name="TextEdit" type="TextEdit" parent="Control/Actions"]
+offset_left = 1520.0
+offset_top = 872.0
+offset_right = 1680.0
+offset_bottom = 904.0
+text = "Add Action to Stack"
+
+[node name="AttackActionButton" type="Button" parent="Control/Actions"]
+offset_left = 1568.0
+offset_top = 912.0
+offset_right = 1640.0
+offset_bottom = 943.0
+text = "Attack"
+
+[node name="DefendActionButton" type="Button" parent="Control/Actions"]
+offset_left = 1568.0
+offset_top = 952.0
+offset_right = 1640.0
+offset_bottom = 983.0
+text = "Defend"
+
+[node name="StaticActions" type="TextEdit" parent="Control/Actions"]
+offset_left = 1496.0
 offset_top = 64.0
-offset_right = 1792.0
-offset_bottom = 840.0
+offset_right = 1768.0
+offset_bottom = 256.0
 
-[node name="SA1" type="TextEdit" parent="Control/StaticActions"]
-offset_left = 1408.0
+[node name="SA1" type="TextEdit" parent="Control/Actions"]
+offset_left = 1568.0
 offset_top = 16.0
-offset_right = 1536.0
+offset_right = 1688.0
 offset_bottom = 56.0
 text = "Static Actions"
-
-[node name="AvailableActions" type="Node" parent="Control"]
-
-[node name="TextEdit" type="TextEdit" parent="Control/AvailableActions"]
-offset_left = 2008.0
-offset_top = 8.0
-offset_right = 2152.0
-offset_bottom = 48.0
-text = "Available Actions"
-
-[node name="AvailableActionsTextbox" type="TextEdit" parent="Control/AvailableActions"]
-offset_left = 1856.0
-offset_top = 56.0
-offset_right = 2304.0
-offset_bottom = 824.0
-
-[node name="AttackActionButton" type="Button" parent="Control/AvailableActions"]
-offset_left = 1856.0
-offset_top = 840.0
-offset_right = 2063.0
-offset_bottom = 871.0
-text = "Close Range Melee Attack"
-
-[node name="DefendActionButton" type="Button" parent="Control/AvailableActions"]
-offset_left = 1928.0
-offset_top = 888.0
-offset_right = 2000.0
-offset_bottom = 919.0
-text = "Defend"
 
 [connection signal="pressed" from="Control/RunPlanner" to="AIAgent" method="_on_run_planner_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/DecreaseHealthButton" to="AIAgent" method="_on_decrease_health_button_pressed"]
@@ -160,5 +152,5 @@ text = "Defend"
 [connection signal="pressed" from="Control/CharacterAttributes/IncreaseStamina" to="AIAgent" method="_on_increase_stamina_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/DecreaseStamina" to="AIAgent" method="_on_decrease_stamina_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/Button" to="AIAgent" method="_on_button_pressed"]
-[connection signal="pressed" from="Control/AvailableActions/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
-[connection signal="pressed" from="Control/AvailableActions/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]
+[connection signal="pressed" from="Control/Actions/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
+[connection signal="pressed" from="Control/Actions/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]

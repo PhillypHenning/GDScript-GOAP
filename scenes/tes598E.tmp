@@ -115,7 +115,7 @@ offset_bottom = 256.0
 [node name="StaticActions" type="TextEdit" parent="Control/StaticActions"]
 offset_left = 1344.0
 offset_top = 64.0
-offset_right = 1792.0
+offset_right = 1616.0
 offset_bottom = 840.0
 
 [node name="SA1" type="TextEdit" parent="Control/StaticActions"]
@@ -128,30 +128,30 @@ text = "Static Actions"
 [node name="AvailableActions" type="Node" parent="Control"]
 
 [node name="TextEdit" type="TextEdit" parent="Control/AvailableActions"]
-offset_left = 2008.0
+offset_left = 1840.0
 offset_top = 8.0
-offset_right = 2152.0
+offset_right = 1984.0
 offset_bottom = 48.0
 text = "Available Actions"
 
 [node name="AvailableActionsTextbox" type="TextEdit" parent="Control/AvailableActions"]
-offset_left = 1856.0
-offset_top = 56.0
-offset_right = 2304.0
-offset_bottom = 824.0
+offset_left = 1728.0
+offset_top = 64.0
+offset_right = 2176.0
+offset_bottom = 832.0
 
 [node name="AttackActionButton" type="Button" parent="Control/AvailableActions"]
-offset_left = 1856.0
-offset_top = 840.0
-offset_right = 2063.0
-offset_bottom = 871.0
+offset_left = 1752.0
+offset_top = 848.0
+offset_right = 1959.0
+offset_bottom = 879.0
 text = "Close Range Melee Attack"
 
 [node name="DefendActionButton" type="Button" parent="Control/AvailableActions"]
-offset_left = 1928.0
-offset_top = 888.0
-offset_right = 2000.0
-offset_bottom = 919.0
+offset_left = 1824.0
+offset_top = 896.0
+offset_right = 1896.0
+offset_bottom = 927.0
 text = "Defend"
 
 [connection signal="pressed" from="Control/RunPlanner" to="AIAgent" method="_on_run_planner_pressed"]

@@ -1,5 +1,5 @@
 extends Node
-#
+
 class_name Action
 
 var action_name: String
