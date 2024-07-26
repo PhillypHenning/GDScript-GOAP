@@ -149,23 +149,23 @@ text = "Defend"
 [node name="PlannerDebug" type="Node" parent="Control"]
 
 [node name="RunPlanner" type="Button" parent="Control/PlannerDebug"]
-offset_left = 296.0
+offset_left = 360.0
 offset_top = 1160.0
-offset_right = 408.0
+offset_right = 472.0
 offset_bottom = 1191.0
 text = "Run Planner"
 
 [node name="PlannerTextBox" type="TextEdit" parent="Control/PlannerDebug"]
 offset_left = 64.0
 offset_top = 832.0
-offset_right = 600.0
+offset_right = 768.0
 offset_bottom = 1152.0
 
 [node name="PlanLen" type="TextEdit" parent="Control/PlannerDebug"]
 offset_left = 64.0
 offset_top = 768.0
-offset_right = 312.0
-offset_bottom = 816.0
+offset_right = 168.0
+offset_bottom = 800.0
 
 [connection signal="pressed" from="Control/CharacterAttributes/DecreaseHealthButton" to="AIAgent" method="_on_decrease_health_button_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/IncreaseHealthButton" to="AIAgent" method="_on_increase_health_button_pressed"]

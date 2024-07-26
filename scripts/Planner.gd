@@ -1,52 +1,54 @@
 extends Node
-#
 class_name Planner
-#
-const Goal = preload("res://scripts/Goal.gd")
-const Action = preload("res://scripts/Action.gd")
 
-func build_plan(available_actions: Array, static_actions: Array, goals: Array, state: Dictionary) -> Array:
-	var new_build_plan: Array = []
-	var state_keys = state.keys()	
-	var states_needed: Array
-		
-	# Merge the Static and Available Actions
-	var actions: Array = static_actions + available_actions
+func build_plan(available_actions: Array, static_actions: Array, primary_goals: Array, world_state: Dictionary) -> Array:
+	# Combine static and available actions
+	var all_actions = available_actions + static_actions
 	
-	# 1. Run through the goals and find the highest to lowest priority states required
-	# 2. Find all the actions that satisfy those goal states
-	# 3. Build plans based on those actions that cost the least to perform
-	# 4. Return the most ideal plan
-	
-	for goal in goals:
-		pass
-		
-	
-	# Collect all states that are needed
-	#for action in available_actions:
-		#for precondition in action.preconditions:
-			#if state_keys.has(precondition):
-				#var have_state = state.get(precondition)
-				#var precondition_needed = action.preconditions.get(precondition)
-				#if have_state != precondition_needed:
-					#states_needed.append({precondition: precondition_needed})
+	# Get the highest priority goal
+	primary_goals.sort_custom(func (a, b): return a.goal_priority > b.goal_priority)
+	var highest_goal = primary_goals[0]
 
+	# Initialize the plan as an empty array
+	var plan = []
 
-	#var actions_that_satisfy_world_state: Array
-	# For all needed states find actions that could satisfy them
+	# Use A* algorithm or any other suitable planning algorithm to build the plan
+	if build_node_plan("a*", plan, all_actions, highest_goal, world_state):
+		return plan
+
+	return []
 	
-	return new_build_plan
+# Recursively build a plan (you can use A*, DFS, or BFS)
+func build_node_plan(algorithm: String, plan: Array, actions: Array, goal: Goal, current_state: Dictionary) -> bool:
+	match algorithm:
+		"a*":
+			# Base Case: Check if the current state already satisfies the goal
+			if satisfies_goal(current_state, goal):
+				return true
+			
+			# Find potential actions that are valid in the current state
+			var valid_actions = []
+			for action in actions:
+				if action.is_valid(current_state):
+					valid_actions.append(action)
 
-func debug_actions(actions: Array) -> void:
-	var text_string: String
-	for action in actions:
-		text_string = "{text_string}\nAction: [{name}]\n\tPreconditions:".format({"text_string": text_string, "name": action.action_name})
-		for key in action.preconditions.keys():
-			text_string = "{text_string}\n\t\tKey: [{name}], Value: [{value}]".format({"text_string": text_string, "name": key, "value": action.preconditions[key]})
-		text_string = "{text_string}\n\tEffects:".format({"text_string": text_string})
-		for key in action.effects.keys():
-			text_string = "{text_string}\n\t\tKey: [{name}], Value: [{value}]".format({"text_string": text_string, "name": key, "value": action.effects[key]})
-		text_string = "{text_string}\n\tCosts:".format({"text_string": text_string})
-		for key in action.cost.keys():
-			text_string = "{text_string}\n\t\tKey: [{name}], Value: [{value}]".format({"text_string": text_string, "name": key, "value": action.cost[key]})
-	print(text_string)
+			# Iterate over valid actions and attempt to build a plan
+			for action in valid_actions:
+				
+				# Create a hypothetical new state by applying the action
+				var new_state = action.apply(current_state)
+				
+				# Add the action to the current plan
+				plan.append(action)
+				
+				# Recursively attempt to build the rest of the plan with the new state
+				if build_node_plan("a*", plan, actions, goal, new_state):
+					return true
+				
+				# Backtrack if the current action did not lead to a valid plan
+				plan.pop_back()
+	return false
+
+# Check if the current state satisfies the given goal
+func satisfies_goal(state: Dictionary, goal: Goal) -> bool:
+	return goal.is_satisfied(state)

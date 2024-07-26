@@ -15,17 +15,25 @@ func _init(init_action_name: String, init_preconditions: Dictionary, init_effect
 
 func is_valid(agent_state: Dictionary) -> bool:
 	for key in preconditions.keys():
-		if agent_state.get(key) != preconditions[key]:
-			return false
-	return true
+		match typeof(agent_state.get(key)):
+			TYPE_BOOL:
+				return agent_state.get(key) == preconditions[key]
+			TYPE_FLOAT:
+				return agent_state.get(key) != preconditions[key]
+			TYPE_INT:
+				return agent_state.get(key) != preconditions[key]
+	return false
 
 func apply(agent_state: Dictionary) -> Dictionary:
 	var new_state = agent_state.duplicate()
 	for key in effects.keys():
-		new_state[key] = effects[key]
+		match typeof(agent_state[key]):
+			TYPE_FLOAT:
+				new_state[key] = clamp(new_state[key]+effects[key], 0, new_state.get("max_{value}".format({"value": key}), 100)) 
+			TYPE_INT:
+				new_state[key] = clamp(new_state[key]+effects[key], 0, new_state.get("max_{value}".format({"value": key}), 100)) 
+			TYPE_BOOL:
+				new_state[key] = effects[key]
 	for key in cost.keys():
 		new_state[key] = cost[key]
 	return new_state
-
-func print():
-	return "Name: [{name}]\n\tPreconditions: [{preconditions}]\n\tEffects: [{effects}]\n\tCost: [{cost}]".format({"name": self.action_name, "preconditions": self.preconditions, "effects": self.effects, "cost": self.cost})

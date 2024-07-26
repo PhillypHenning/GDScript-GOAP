@@ -13,6 +13,14 @@ offset_right = 40.0
 offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
 
+[node name="RunPlanner" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 816.0
+offset_top = 1024.0
+offset_right = 919.0
+offset_bottom = 1055.0
+text = "Run Planner"
+
 [node name="CharacterAttributes" type="Node" parent="Control"]
 
 [node name="DecreaseHealthButton" type="Button" parent="Control/CharacterAttributes"]
@@ -146,27 +154,7 @@ offset_right = 2000.0
 offset_bottom = 919.0
 text = "Defend"
 
-[node name="PlannerDebug" type="Node" parent="Control"]
-
-[node name="RunPlanner" type="Button" parent="Control/PlannerDebug"]
-offset_left = 296.0
-offset_top = 1160.0
-offset_right = 408.0
-offset_bottom = 1191.0
-text = "Run Planner"
-
-[node name="PlannerTextBox" type="TextEdit" parent="Control/PlannerDebug"]
-offset_left = 64.0
-offset_top = 832.0
-offset_right = 600.0
-offset_bottom = 1152.0
-
-[node name="PlanLen" type="TextEdit" parent="Control/PlannerDebug"]
-offset_left = 64.0
-offset_top = 768.0
-offset_right = 312.0
-offset_bottom = 816.0
-
+[connection signal="pressed" from="Control/RunPlanner" to="AIAgent" method="_on_run_planner_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/DecreaseHealthButton" to="AIAgent" method="_on_decrease_health_button_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/IncreaseHealthButton" to="AIAgent" method="_on_increase_health_button_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/IncreaseStamina" to="AIAgent" method="_on_increase_stamina_pressed"]
@@ -174,4 +162,3 @@ offset_bottom = 816.0
 [connection signal="pressed" from="Control/CharacterAttributes/Button" to="AIAgent" method="_on_button_pressed"]
 [connection signal="pressed" from="Control/AvailableActions/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
 [connection signal="pressed" from="Control/AvailableActions/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]
-[connection signal="pressed" from="Control/PlannerDebug/RunPlanner" to="AIAgent" method="_on_run_planner_pressed"]
