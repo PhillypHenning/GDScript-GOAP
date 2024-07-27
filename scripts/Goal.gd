@@ -2,6 +2,9 @@ extends Node
 
 class_name Goal
 
+const MIN_PRIORITY = 0
+const MAX_PRIORITY = 10
+
 var goal_name: String
 var goal_priority: float
 var goal_priority_callable: Callable
@@ -39,7 +42,7 @@ func new_goal_with_timer(inc_goal_name: String,  inc_goal_priority_callable: Cal
 	
 func calculate_goal_priority(parameters: Dictionary) -> void:
 	if goal_priority_callable:
-		self.goal_priority = self.goal_priority_callable.call(parameters)
+		self.goal_priority = clamp(self.goal_priority_callable.call(parameters), MIN_PRIORITY, MAX_PRIORITY)
 
 
 func is_satisfied(agent_state: Dictionary) -> bool:
