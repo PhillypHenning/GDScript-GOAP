@@ -19,9 +19,9 @@ var primary_goals: Array = []
 var world_state: Dictionary = {}
 var current_plan: Array = []
 var static_actions: Array = [
-	ActionPack.new("antsy_move", 
+	ActionPack.new("DoTheAntsyShuffle", 
 		{
-			"antsy": 0,
+			"antsy": func(a): return a > 0, # Precondition: Antsy should be lower than "0"
 		},
 		{	# Effects
 			"antsy": -1,
@@ -29,7 +29,7 @@ var static_actions: Array = [
 		{	# Cost
 		},
 	),
-	ActionPack.new("move_towards_target", 
+	ActionPack.new("MoveTowardsTarget", 
 		{
 			"target_in_attack_range": false
 		},
@@ -40,7 +40,7 @@ var static_actions: Array = [
 			"antsy": 1
 		},
 	),
-	ActionPack.new("break_los", 
+	ActionPack.new("BreakLineOfSight", 
 		{	
 			"has_los": true
 		},
@@ -99,17 +99,16 @@ func _ready():
 	#primary_goals.append(goal_conserve_stamina.new_goal_with_callable("conserve_stamina", calculate_conserve_stamina_priority, {"conserve_stamina": true}))
 	
 	
-	#primary_goals.append(goal_keep_moving.new_goal_with_timer("keep_moving", calculate_keep_moving_priority, 1, keep_moving_interval_increase, get_parent(), {"antsy": 0}))
+	primary_goals.append(goal_keep_moving.new_goal_with_timer("keep_moving", calculate_keep_moving_priority, 1, keep_moving_interval_increase, get_parent(), {"antsy": 0}))
+	primary_goals.append(goal_conserve_health.new_goal_with_timer("conserve_health", calculate_conserve_health_priority, 2.5, conserve_health_interval_decrease, get_parent(), {"has_los": false}))
 	primary_goals.append(goal_attack_enemy.new_goal_with_static_priority("defeat_enemy", 4.5, {"defeat_enemy": true}))
-	#primary_goals.append(goal_conserve_health.new_goal_with_timer("conserve_health", calculate_conserve_health_priority, 2.5, conserve_health_interval_decrease, get_parent(), {"has_los": false}))
-	
+
 	# Keep in optimal range will need to be written after some actions are in place.
 	# Initial thought: Based on the actions, determine what the optimal range is
 	# primary_goals.append(Goal.new().new_goal_with_callable("keep_in_optimal_range", calculate_conserve_stamina_priority))
 
 func _init():
 	game_start_time = Time.get_unix_time_from_system()
-	_on_attack_action_button_pressed()
 
 func _process(_delta: float) -> void:
 	calculate_severity_level(simulated_character, "health", false)
@@ -316,7 +315,7 @@ func _on_increase_health_button_pressed():
 
 func _on_attack_action_button_pressed():
 	available_actions.append(ActionPack.new(
-		"AttackTarget", 
+		"AttackTargetInRange", 
 		{
 			"target_in_attack_range": true,
 			"defeat_enemy": false,
