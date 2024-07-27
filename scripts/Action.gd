@@ -14,17 +14,16 @@ func _init(init_action_name: String, init_preconditions: Dictionary, init_effect
 	self.effects = init_effects
 	self.cost = init_cost
 
-
-func is_valid(agent_state: Dictionary, criteria: Dictionary) -> bool:
-	for key in criteria.keys():
-		if preconditions.has(key):
-			match typeof(agent_state.get(key)):
-				TYPE_BOOL:
-					return agent_state.get(key) == preconditions[key]
-				TYPE_FLOAT:
-					return agent_state.get(key) != preconditions[key]
-				TYPE_INT:
-					return agent_state.get(key) != preconditions[key]
+# is_valid takes the world state and a key
+# It first checks if the action (self) has a precondition that matches the key
+# It then checks the type of they key based on the world state.
+func is_valid(agent_state: Dictionary, key) -> bool:
+	if preconditions.has(key):
+		match typeof(preconditions[key]):
+			TYPE_BOOL:
+				return agent_state.get(key) == preconditions[key]
+			TYPE_CALLABLE:
+				return preconditions[key].call(agent_state.get(key))
 	return false
 
 
