@@ -22,7 +22,7 @@ func build_plan(available_actions: Array, static_actions: Array, primary_goals: 
 
 	# Use A* algorithm or any other suitable planning algorithm to build the plan
 	for goal in primary_goals:
-		if build_node_plan("a*", plan, all_actions, goal, world_state):
+		if build_node_plan("a*", plan, all_actions, goal, world_state, goal.goal_criteria):
 			if plan.is_empty():
 				continue
 			else:
@@ -30,26 +30,27 @@ func build_plan(available_actions: Array, static_actions: Array, primary_goals: 
 	return plan
 	
 # Recursively build a plan (One of A*, DFS, or BFS)(A* is the only implemented one at this time)
-func build_node_plan(algorithm: String, plan: Array, actions: Array, goal: Goal, current_state: Dictionary) -> bool:
+func build_node_plan(algorithm: String, plan: Array, actions: Array, goal: Goal, current_state: Dictionary, goal_criteria: Dictionary) -> bool:
 	match algorithm:
 		"a*":
 			# Base Case: Check if the current state already satisfies the goal
-			if satisfies_goal(current_state, goal):
+			if satisfies_goal(current_state, goal_criteria):
 				return true
 
-			# Find potential actions that are valid in the current state
+			# Find actions that will satisfy the goals desired world state
+			# For example:
+			#	For the goal "Keep moving" the desired world state is to have "antsy" at 0
 			var valid_actions = []
-			for action in actions:
-				# TODO: 1. is_valid is looping on the keys but returns on the first success.
-				# This is causing a misinteruption of what is required.
-				# It's likely the case that we will need to make a recursive loop, that finds all actions that can satisfy both the intial criteria, as well as criteria gained as a result OF the plan
-				# For example:
-				#	If the goal is "defeat enemy"
-				#	Then the AttackEnemy action is selected
-				# 	But then the AttackEnemy has preconditions itself, that will also need to be accounted for
-				# 	(Attack Enemy: Satisfies Defeat Enemy) -> (Move Towards Enemy: Satisfies is character in range)
-				if action.is_valid(current_state, goal.goal_criteria):
-					valid_actions.append(action)
+			for criteria_key in goal_criteria:
+				for action in actions:
+					if action.is_valid(current_state, criteria_key):
+						valid_actions.append(action)
+						# Add any preconditions to the goal_criteria list
+						# Example:
+						##	AttackTarget is used to "defeatenemy"
+						## 	But AttackTarget requires that the character is in range
+						##	The precondition of "GetInRange" is now required to build a plan
+						goal_criteria.merge(action.preconditions)
 
 			# Iterate over valid actions and attempt to build a plan
 			for action in valid_actions:
@@ -61,13 +62,18 @@ func build_node_plan(algorithm: String, plan: Array, actions: Array, goal: Goal,
 				plan.append(action)
 
 				# Recursively attempt to build the rest of the plan with the new state
-				if build_node_plan("a*", plan, actions, goal, new_state):
+				if build_node_plan("a*", plan, actions, goal, new_state, goal_criteria):
 					return true
 
 				# Backtrack if the current action did not lead to a valid plan
 				plan.pop_back()
 	return false
 
-# Check if the current state satisfies the given goal
-func satisfies_goal(state: Dictionary, goal: Goal) -> bool:
-	return goal.is_satisfied(state)
+
+func satisfies_goal(agent_state: Dictionary, goal_criteria: Dictionary) -> bool:
+	var tracker: bool = false
+	for key in goal_criteria.keys():
+		tracker = agent_state.get(key) == goal_criteria[key]
+		if !tracker:
+			return false
+	return tracker

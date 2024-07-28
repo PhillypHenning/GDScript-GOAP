@@ -6,13 +6,15 @@ var action_name: String
 var preconditions: Dictionary = {}
 var effects: Dictionary = {}
 var cost: Dictionary = {}
+var is_static_action: bool
 
 
-func _init(init_action_name: String, init_preconditions: Dictionary, init_effects: Dictionary, init_cost: Dictionary):
+func _init(init_action_name: String, init_preconditions: Dictionary, init_effects: Dictionary, init_cost: Dictionary, init_is_static_action: bool = true):
 	self.action_name = init_action_name
 	self.preconditions = init_preconditions
 	self.effects = init_effects
 	self.cost = init_cost
+	self.is_static_action = init_is_static_action
 
 # is_valid takes the world state and a key
 # It first checks if the action (self) has a precondition that matches the key

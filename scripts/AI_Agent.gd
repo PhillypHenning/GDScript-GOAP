@@ -16,7 +16,6 @@ enum SEVERITY_LEVEL {
 }
 
 var primary_goals: Array = []
-var world_state: Dictionary = {}
 var current_plan: Array = []
 var static_actions: Array = [
 	ActionPack.new("DoTheAntsyShuffle", 
@@ -86,7 +85,6 @@ var goal_attack_enemy: Goal = GoalPack.new()
 
 
 @onready var goals_textbox = $"../Control/Goals/Goals"
-@onready var state_textbox = $"../Control/State/StateDebug"
 @onready var sim_char_textbox = $"../Control/CharacterAttributes/SimCharDebug"
 @onready var static_actions_textbox = $"../Control/StaticActions/StaticActions"
 @onready var available_actions_textbox = $"../Control/AvailableActions/AvailableActionsTextbox"
@@ -95,10 +93,8 @@ var goal_attack_enemy: Goal = GoalPack.new()
 @onready var elapsed_time_text = $"../Control/ElapsedTimeText"
 
 func _ready():
-	#primary_goals.append(GoalPack.new().new_goal_with_callable("conserve_health", calculate_conserve_health_priority, {"conserve_health": true}))
+
 	#primary_goals.append(goal_conserve_stamina.new_goal_with_callable("conserve_stamina", calculate_conserve_stamina_priority, {"conserve_stamina": true}))
-	
-	
 	primary_goals.append(goal_keep_moving.new_goal_with_timer("keep_moving", calculate_keep_moving_priority, 1, keep_moving_interval_increase, get_parent(), {"antsy": 0}))
 	primary_goals.append(goal_conserve_health.new_goal_with_timer("conserve_health", calculate_conserve_health_priority, 2.5, conserve_health_interval_decrease, get_parent(), {"has_los": false}))
 	primary_goals.append(goal_attack_enemy.new_goal_with_static_priority("defeat_enemy", 4.5, {"defeat_enemy": true}))
@@ -116,7 +112,6 @@ func _process(_delta: float) -> void:
 	calculate_severity_level(simulated_character, "antsy", true)
 
 
-	world_state.merge(simulated_character, true)
 	determine_goal_priority()
 	
 	run_planner()
@@ -124,7 +119,6 @@ func _process(_delta: float) -> void:
 	check_if_enemy_is_defeated()
 
 	# debugging
-	debug_state()
 	debug_simulated_character()
 	debug_goals()
 	debug_static_actions()
@@ -153,7 +147,7 @@ func determine_goal_priority():
 
 func run_planner() -> void:
 	var planner = PlannerPack.new()
-	current_plan = planner.build_plan(available_actions, static_actions, primary_goals, world_state)
+	current_plan = planner.build_plan(available_actions, static_actions, primary_goals, simulated_character)
 
 
 ##-- GOAL CALCULATIONS --##
@@ -239,21 +233,12 @@ func debug_goals() -> void:
 			goals_text = "{goal_text}\n\t\t[{criteria}] : [{value}]".format({"goal_text": goals_text, "criteria": criteria, "value": goal.goal_criteria[criteria]})
 	goals_textbox.text = goals_text
 
-
-func debug_state() -> void:
-	var character_text: String
-	var character_keys = simulated_character.keys()
-	for attribute in character_keys:
-		character_text = "{character_text}\nAttribute: [{attribute}], Value: [{value}]".format({"character_text": character_text, "attribute": attribute, "value": simulated_character[attribute]})
-	sim_char_textbox.text = character_text
-
-
 func debug_simulated_character() -> void:
 	var state_text: String
-	var state_keys = world_state.keys()
+	var state_keys = simulated_character.keys()
 	for state in state_keys:
-		state_text = "{state_text}\nState: [{state}], Value: [{value}]".format({"state_text": state_text, "state": state, "value": world_state[state]})
-	state_textbox.text = state_text
+		state_text = "{state_text}\nState: [{state}], Value: [{value}]".format({"state_text": state_text, "state": state, "value": simulated_character[state]})
+	sim_char_textbox.text = state_text
 
 
 func debug_static_actions() -> void:
@@ -325,7 +310,8 @@ func _on_attack_action_button_pressed():
 		},
 		{
 			"stamina": -1
-		}
+		},
+		false
 	))
 
 
@@ -341,7 +327,8 @@ func _on_defend_action_button_pressed():
 			"antsy": 1,
 		}, 
 		{
-		}
+		},
+		false
 	))
 
 
@@ -357,6 +344,22 @@ func _on_decrease_stamina_pressed():
 	simulated_character.stamina = clamp(simulated_character.stamina-1, 0, simulated_character.max_stamina)
 
 
-func _on_button_pressed():
+func _on_reset_button_pressed():
+	available_actions.clear()
+
+
+func _on_antsy_button_pressed():
 	simulated_character.antsy = 0
+
+func _on_apply_button_pressed():
+	for index in current_plan.size():
+		simulated_character = current_plan[index].apply(simulated_character)
+		if !current_plan[index].is_static_action:
+			for aaindex in available_actions.size():
+				if available_actions[aaindex].action_name == current_plan[index].action_name:
+					available_actions.remove_at(aaindex)
+					break
+	current_plan.clear()
+		
 ##----- ------ -----##
+
