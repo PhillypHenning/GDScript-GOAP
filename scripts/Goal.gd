@@ -46,7 +46,9 @@ func calculate_goal_priority(parameters: Dictionary) -> void:
 
 
 func is_satisfied(agent_state: Dictionary) -> bool:
-	# NOTE: This will only work on the first key that matches.. 
+	var tracker: bool = false
 	for key in goal_criteria.keys():
-		return agent_state.get(key) == goal_criteria[key]
-	return false
+		tracker = agent_state.get(key) == goal_criteria[key]
+		if !tracker:
+			return false
+	return tracker
