@@ -10,9 +10,6 @@ var goal_priority: float
 var goal_priority_callable: Callable
 var goal_criteria: Dictionary = {}
 
-func _init() -> void:
-	pass
-
 func new_goal_with_callable(inc_goal_name: String, inc_goal_priority_callable: Callable, criteria: Dictionary) -> Goal:
 	self.goal_name = inc_goal_name
 	self.goal_priority_callable = inc_goal_priority_callable

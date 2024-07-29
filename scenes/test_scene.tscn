@@ -16,30 +16,30 @@ metadata/_edit_use_anchors_ = true
 [node name="CharacterAttributes" type="Node" parent="Control"]
 
 [node name="DecreaseHealthButton" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 424.0
+offset_left = 256.0
 offset_top = 520.0
-offset_right = 559.0
+offset_right = 391.0
 offset_bottom = 551.0
 text = "Decrease Health"
 
 [node name="IncreaseHealthButton" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 248.0
+offset_left = 104.0
 offset_top = 520.0
-offset_right = 383.0
+offset_right = 239.0
 offset_bottom = 551.0
 text = "Increase Health"
 
 [node name="IncreaseStamina" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 248.0
+offset_left = 104.0
 offset_top = 568.0
-offset_right = 392.0
+offset_right = 248.0
 offset_bottom = 600.0
 text = "Increase Stamina"
 
 [node name="DecreaseStamina" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 416.0
+offset_left = 256.0
 offset_top = 568.0
-offset_right = 564.0
+offset_right = 404.0
 offset_bottom = 599.0
 text = "Decrease Stamina"
 
@@ -57,11 +57,18 @@ offset_right = 704.0
 offset_bottom = 504.0
 
 [node name="AntsyButton" type="Button" parent="Control/CharacterAttributes"]
-offset_left = 248.0
-offset_top = 616.0
-offset_right = 376.0
-offset_bottom = 647.0
+offset_left = 576.0
+offset_top = 520.0
+offset_right = 704.0
+offset_bottom = 551.0
 text = "Reset Antsy"
+
+[node name="BeingAttackedButton" type="Button" parent="Control/CharacterAttributes"]
+offset_left = 552.0
+offset_top = 568.0
+offset_right = 705.0
+offset_bottom = 599.0
+text = "Set Being Attacked"
 
 [node name="State" type="Node" parent="Control"]
 
@@ -171,6 +178,7 @@ offset_bottom = 1168.0
 [connection signal="pressed" from="Control/CharacterAttributes/IncreaseStamina" to="AIAgent" method="_on_increase_stamina_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/DecreaseStamina" to="AIAgent" method="_on_decrease_stamina_pressed"]
 [connection signal="pressed" from="Control/CharacterAttributes/AntsyButton" to="AIAgent" method="_on_antsy_button_pressed"]
+[connection signal="pressed" from="Control/CharacterAttributes/BeingAttackedButton" to="AIAgent" method="_on_being_attacked_button_pressed"]
 [connection signal="pressed" from="Control/AvailableActions/AttackActionButton" to="AIAgent" method="_on_attack_action_button_pressed"]
 [connection signal="pressed" from="Control/AvailableActions/DefendActionButton" to="AIAgent" method="_on_defend_action_button_pressed"]
 [connection signal="pressed" from="Control/AvailableActions/ResetButton" to="AIAgent" method="_on_reset_button_pressed"]

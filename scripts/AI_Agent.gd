@@ -5,6 +5,8 @@ class_name AI_Agent
 const GoalPack = preload("res://scripts/Goal.gd")
 const ActionPack = preload("res://scripts/Action.gd")
 const PlannerPack = preload("res://scripts/Planner.gd")
+const UtilsPack = preload("res://scripts/Utils.gd")
+var Utils = UtilsPack.new()
 
 enum SEVERITY_LEVEL {
 	NONE = 0,
@@ -71,17 +73,21 @@ var simulated_character: Dictionary = {
 	"character_can_attack": true,
 	
 	"defeat_enemy": false,
+	
+	"character_is_being_attacked": false,
+	"character_is_defending": false,
+	
+	"speed": 300,
+	"character_position": Vector2(0,0),
+	"target_position": Vector2(300,300),
 }
 
 var game_start_time: float
 
-var debug_run_planner: bool = false
-
-# Goal Preloads (Allows access to priority)
 var goal_keep_moving: Goal = GoalPack.new()
 var goal_conserve_health: Goal = GoalPack.new()
-var goal_conserve_stamina: Goal = GoalPack.new()
 var goal_attack_enemy: Goal = GoalPack.new()
+var goal_defend_against_attack: Goal = GoalPack.new()
 
 
 @onready var goals_textbox = $"../Control/Goals/Goals"
@@ -93,27 +99,23 @@ var goal_attack_enemy: Goal = GoalPack.new()
 @onready var elapsed_time_text = $"../Control/ElapsedTimeText"
 
 func _ready():
-
-	#primary_goals.append(goal_conserve_stamina.new_goal_with_callable("conserve_stamina", calculate_conserve_stamina_priority, {"conserve_stamina": true}))
+	# Improvements that could be made:
+	##	1. conserve_health
+	##		- Conserve health goes beyond breaking los though this is a good start. Another option for "Conserving health" would be to focus on defensive actions. In this scenario, when a creature takes damage it would temporarily boost the priority of the "defense_action" goal. 
 	primary_goals.append(goal_keep_moving.new_goal_with_timer("keep_moving", calculate_keep_moving_priority, 1, keep_moving_interval_increase, get_parent(), {"antsy": 0}))
 	primary_goals.append(goal_conserve_health.new_goal_with_timer("conserve_health", calculate_conserve_health_priority, 2.5, conserve_health_interval_decrease, get_parent(), {"has_los": false}))
 	primary_goals.append(goal_attack_enemy.new_goal_with_static_priority("defeat_enemy", 4.5, {"defeat_enemy": true}))
-
-	# Keep in optimal range will need to be written after some actions are in place.
-	# Initial thought: Based on the actions, determine what the optimal range is
-	# primary_goals.append(Goal.new().new_goal_with_callable("keep_in_optimal_range", calculate_conserve_stamina_priority))
+	primary_goals.append(goal_defend_against_attack.new_goal_with_static_priority("defense_action", 7, {"character_is_defending": true}))
 
 func _init():
 	game_start_time = Time.get_unix_time_from_system()
 
 func _process(_delta: float) -> void:
-	calculate_severity_level(simulated_character, "health", false)
-	calculate_severity_level(simulated_character, "stamina", false)
+	calculate_severity_level(simulated_character, "health")
+	calculate_severity_level(simulated_character, "stamina")
 	calculate_severity_level(simulated_character, "antsy", true)
 
-
 	determine_goal_priority()
-	
 	run_planner()
 	
 	check_if_enemy_is_defeated()
@@ -125,7 +127,7 @@ func _process(_delta: float) -> void:
 	debug_available_actions()
 	debug_available_plan()
 	debug_game_elapsed_time()
-
+	Utils.calculate_time_to_reach_destination(simulated_character.speed, simulated_character.character_position, simulated_character.target_position)
 
 
 
@@ -172,12 +174,12 @@ func keep_moving_interval_increase() -> void:
 	simulated_character.antsy = clamp((simulated_character.antsy+.3), 0, simulated_character.max_antsy)
 
 
-func calculate_severity_level(state: Dictionary, key: String, reversed: bool) -> bool:
-	var current =  simulated_character.get(key, false)
-	var max = simulated_character.get("max_{key}".format({"key": key}), false)
+func calculate_severity_level(state: Dictionary, key: String, reversed: bool = false) -> bool:
+	var severity_current =  simulated_character.get(key, false)
+	var severity_max = simulated_character.get("max_{key}".format({"key": key}), false)
 	var severity = simulated_character.get("{key}_severity".format({"key": key}), false)
 
-	if current == max:
+	if severity_current == severity_max:
 		if reversed:
 			severity = SEVERITY_LEVEL.MAX
 		else:
@@ -185,9 +187,9 @@ func calculate_severity_level(state: Dictionary, key: String, reversed: bool) ->
 	else:
 		var formula: float
 		if reversed:
-			formula = ((current / max) * 100)
+			formula = ((severity_current / severity_max) * 100)
 		else:
-			formula = 100 - ((current / max) * 100)
+			formula = 100 - ((severity_current / severity_max) * 100)
 		if formula == SEVERITY_LEVEL.MAX:
 			severity = SEVERITY_LEVEL.MAX
 		elif formula >= SEVERITY_LEVEL.DESPERATE:
@@ -319,21 +321,16 @@ func _on_defend_action_button_pressed():
 	available_actions.append(ActionPack.new(
 		"DefendAgainstAttack", 
 		{
-			"chracter_can_defend": true, 
-			"character_is_being_attacked": true
-		}, 
+			"character_is_being_attacked": true,
+			"character_is_defending": false,
+		},
 		{
-			"save_health": true,
-			"antsy": 1,
-		}, 
+			"character_is_defending": true,
+		},
 		{
 		},
 		false
 	))
-
-
-func _on_run_planner_pressed():
-	debug_run_planner = true
 
 
 func _on_increase_stamina_pressed():
@@ -360,6 +357,7 @@ func _on_apply_button_pressed():
 					available_actions.remove_at(aaindex)
 					break
 	current_plan.clear()
-		
-##----- ------ -----##
 
+func _on_being_attacked_button_pressed():
+	simulated_character.character_is_being_attacked = !simulated_character.character_is_being_attacked
+##----- ------ -----##

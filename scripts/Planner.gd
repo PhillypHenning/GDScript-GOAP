@@ -51,6 +51,9 @@ func build_node_plan(algorithm: String, plan: Array, actions: Array, goal: Goal,
 						## 	But AttackTarget requires that the character is in range
 						##	The precondition of "GetInRange" is now required to build a plan
 						goal_criteria.merge(action.preconditions)
+			
+			# Improvement: Sorting
+			##	- If multiple actions accomplish the same action, then it will become necessary to filter the actions down to the "best option"
 
 			# Iterate over valid actions and attempt to build a plan
 			for action in valid_actions:
