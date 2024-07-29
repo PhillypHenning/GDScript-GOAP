@@ -17,3 +17,19 @@ The GDScript-GOAP project is a package for adding a GOAP AI to a Godot project.
 **goal_criteria** is a means of expressing a desired world state the goal is searching for. During the *build_plan* function, the **goal_criteria** is compared against all available actions **effects**, actions whose **effects** meet **goal_criteria** are considered well other options would be discarded.
 
 If no available actions **effects** meet the **goal_criteria** then the *build_plan* function will loop to the next goal in the list based on priority.
+
+
+
+## Potential improvements (after OpenAI Review)
+### 1. Action Class
+- **Constructor Improvement**: Use `_ready()` instead of `_init()` to initialize node properties since Godot handles the lifecycle of nodes more efficiently this way.
+- **Preconditions Check**: Improve the `is_valid` method to better handle cases where preconditions aren't simple key-value pairs.
+- **String Typing for `cost`**: Although you mentioned `cost` as a `Dictionary`, consider using a `float` or `int` instead for easier calculation and consistency.
+
+### 2. Goal Class
+- **Initialization Refactor**: Simplify and unify the creators of the `Goal` instance.
+- **Callable Validation**: Add checks to ensure `Callable` is valid before attempting to call.
+
+### 3. Planner Class
+- **Combining and Sorting Actions**: Ensure action sets are unique and sort necessary actions by cost efficiently.
+- **Plan Building**: Optimize the recursive `build_node_plan` function, including memoizing states already evaluated.

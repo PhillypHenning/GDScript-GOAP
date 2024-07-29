@@ -5,11 +5,11 @@ class_name Action
 var action_name: String
 var preconditions: Dictionary = {}
 var effects: Dictionary = {}
-var cost: Dictionary = {}
+var cost: float = 0.0
 var is_static_action: bool
 
 
-func _init(init_action_name: String, init_preconditions: Dictionary, init_effects: Dictionary, init_cost: Dictionary, init_is_static_action: bool = true):
+func _init(init_action_name: String, init_preconditions: Dictionary, init_effects: Dictionary, init_cost: float = 0.0, init_is_static_action: bool = true):
 	self.action_name = init_action_name
 	self.preconditions = init_preconditions
 	self.effects = init_effects
@@ -40,6 +40,4 @@ func apply(agent_state: Dictionary) -> Dictionary:
 					new_state[key] = clamp(new_state[key]+effects[key], 0, new_state.get("max_{value}".format({"value": key}), 100)) 
 				TYPE_BOOL:
 					new_state[key] = effects[key]
-	for key in cost.keys():
-		new_state[key] = cost[key]
 	return new_state

@@ -27,8 +27,6 @@ var static_actions: Array = [
 		{	# Effects
 			"antsy": -1,
 		}, 
-		{	# Cost
-		},
 	),
 	ActionPack.new("MoveTowardsTarget", 
 		{
@@ -36,9 +34,6 @@ var static_actions: Array = [
 		},
 		{	# Effects
 			"target_in_attack_range": true
-		}, 
-		{	# Cost
-			"antsy": 1
 		},
 	),
 	ActionPack.new("BreakLineOfSight", 
@@ -47,8 +42,6 @@ var static_actions: Array = [
 		},
 		{	# Effects
 			"has_los": false,
-		},
-		{	# Cost
 		},
 	),
 ]
@@ -252,9 +245,7 @@ func debug_static_actions() -> void:
 		text_string = "{text_string}\n\tEffects:".format({"text_string": text_string})
 		for key in action.effects.keys():
 			text_string = "{text_string}\n\t\tKey: [{name}], Value: [{value}]".format({"text_string": text_string, "name": key, "value": action.effects[key]})
-		text_string = "{text_string}\n\tCosts:".format({"text_string": text_string})
-		for key in action.cost.keys():
-			text_string = "{text_string}\n\t\tKey: [{name}], Value: [{value}]".format({"text_string": text_string, "name": key, "value": action.cost[key]})
+		text_string = "{text_string}\n\tCosts: [{cost}]".format({"text_string": text_string, "cost": action.cost})
 	static_actions_textbox.text = text_string
 
 
@@ -310,9 +301,7 @@ func _on_attack_action_button_pressed():
 		{
 			"defeat_enemy": true,
 		},
-		{
-			"stamina": -1
-		},
+		0.0,
 		false
 	))
 
@@ -327,8 +316,7 @@ func _on_defend_action_button_pressed():
 		{
 			"character_is_defending": true,
 		},
-		{
-		},
+		0.0,
 		false
 	))
 
