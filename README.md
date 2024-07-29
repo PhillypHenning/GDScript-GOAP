@@ -22,9 +22,11 @@ If no available actions **effects** meet the **goal_criteria** then the *build_p
 
 ## Potential improvements (after OpenAI Review)
 ### 1. Action Class
-- **Constructor Improvement**: Use `_ready()` instead of `_init()` to initialize node properties since Godot handles the lifecycle of nodes more efficiently this way.
-- **Preconditions Check**: Improve the `is_valid` method to better handle cases where preconditions aren't simple key-value pairs.
-- **String Typing for `cost`**: Although you mentioned `cost` as a `Dictionary`, consider using a `float` or `int` instead for easier calculation and consistency.
+- [DISREGARD] **Constructor Improvement**: Use `_ready()` instead of `_init()` to initialize node properties since Godot handles the lifecycle of nodes more efficiently this way.
+    - _ready doesn't allow for parameter variables, disregard.
+- [DISREGARD] **Preconditions Check**: Improve the `is_valid` method to better handle cases where preconditions aren't simple key-value pairs.
+    - Currently K/V pairs can include callables which adds a lot of flexability to what a precondition can be. Disregarding.. 
+- [DONE] **String Typing for `cost`**: Although you mentioned `cost` as a `Dictionary`, consider using a `float` or `int` instead for easier calculation and consistency.
 
 ### 2. Goal Class
 - **Initialization Refactor**: Simplify and unify the creators of the `Goal` instance.
